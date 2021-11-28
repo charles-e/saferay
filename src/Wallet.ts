@@ -4,13 +4,13 @@ import nacl from "tweetnacl";
 import * as bip39 from "bip39";
 import * as bip32 from "bip32";
 
-import { Account, Connection, PublicKey } from "@safecoin/web3.js";
+import { Keypair, Connection, PublicKey } from "@safecoin/web3.js";
 
 import { System } from "./System";
 import { BPFLoader } from "./BPFLoader";
 
-function pathToAccount(path: bip32.BIP32Interface): Account {
-  return new Account(
+function pathToAccount(path: bip32.BIP32Interface): Keypair {
+  return Keypair.fromSecretKey(
     nacl.sign.keyPair.fromSeed(path.privateKey as any).secretKey,
   );
 }
@@ -32,7 +32,7 @@ export class Wallet {
     return Wallet.fromSeed(seed, conn);
   }
 
-  static fromAccount(account: Account, conn: Connection): Wallet {
+  static fromAccount(account: Keypair, conn: Connection): Wallet {
     const base = bip32
       .fromSeed(Buffer.from(account.secretKey))
       .derivePath(`m/501'/0'/0`);
@@ -53,7 +53,7 @@ export class Wallet {
   private sys: System;
 
   constructor(
-    public account: Account,
+    public account: Keypair,
     public base: bip32.BIP32Interface,
     public conn: Connection,
   ) {
@@ -78,7 +78,7 @@ export class Wallet {
     return new Wallet(pathToAccount(child), child, this.conn);
   }
 
-  public deriveAccount(subpath: string): Account {
+  public deriveAccount(subpath: string): Keypair {
     return this.derive(subpath).account;
   }
 
@@ -86,7 +86,7 @@ export class Wallet {
     return this.sys.accountInfo(this.account.publicKey);
   }
 
-  public async loadProgram(binPath: string): Promise<Account> {
+  public async loadProgram(binPath: string): Promise<Keypair> {
     const bpfLoader = new BPFLoader(this);
     return bpfLoader.loadFile(binPath);
   }

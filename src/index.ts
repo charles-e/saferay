@@ -1,6 +1,6 @@
 import { Connection } from "@safecoin/web3.js";
 
-export { Account, PublicKey } from "@safecoin/web3.js";
+export { Keypair, PublicKey } from "@safecoin/web3.js";
 export { Wallet } from "./Wallet";
 export { SPLToken } from "./SPLToken";
 export { ProgramAccount } from "./ProgramAccount";
@@ -15,13 +15,13 @@ export interface IConnectOptions {
 }
 
 const defaultRPCHosts = {
-  local: "http://localhost:8899",
+  local: "http://localhost:8328",
 
-  dev: "https://devnet.safecoin.com",
-  devnet: "https://devnet.safecoin.com",
+  dev: "https://api.devnet.safecoin.org",
+  devnet: "https://api.devnet.safecoin.org",
 
-  main: "https://api.mainnet-beta.safecoin.com",
-  mainnet: "https://api.mainnet-beta.safecoin.com",
+  main: "https://api.mainnet-beta.safecoin.org",
+  mainnet: "https://api.mainnet-beta.safecoin.org",
 };
 
 export namespace safecoin {

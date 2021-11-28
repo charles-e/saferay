@@ -1,4 +1,4 @@
-import { Account, Wallet } from "./index"
+import { Keypair, Wallet } from "./index"
 
 import { promises as fs } from "fs"
 const { readFile, writeFile } = fs
@@ -25,7 +25,7 @@ export class Deployer {
 
   constructor(private records: AccountRecords, public filePath: string) { }
 
-  public async ensure(key: string, action: () => Promise<Account>): Promise<Account> {
+  public async ensure(key: string, action: () => Promise<Keypair>): Promise<Keypair> {
     let account = this.account(key)
     if (account) {
       return account
@@ -47,14 +47,14 @@ export class Deployer {
     return account
   }
 
-  public account(key: string): Account | null {
+  public account(key: string): Keypair | null {
     const keypair = this.records[key]
 
     if (!keypair) {
       return null
     }
 
-    return new Account(Buffer.from(keypair.secret, "hex"))
+    return Keypair.fromSeed(Buffer.from(keypair.secret, "hex"))
   }
 
   private async save() {

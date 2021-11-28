@@ -3,7 +3,7 @@ import { TransactionInstruction, SYSVAR_RENT_PUBKEY } from '@safecoin/web3.js';
 
 import { Wallet } from './Wallet';
 import { System } from './System';
-import { Account, PublicKey } from '.';
+import { Keypair, PublicKey } from '.';
 import { BaseProgram } from './BaseProgram';
 
 import BufferLayout from 'buffer-layout';
@@ -41,7 +41,7 @@ export interface InitMintParams {
   mintAuthority: PublicKey
   decimals: number
 
-  account?: Account
+  account?: Keypair
 }
 
 export interface InitMintInstructionParams extends InitMintParams {
@@ -51,7 +51,7 @@ export interface InitMintInstructionParams extends InitMintParams {
 export interface InitAccountParams {
   token: PublicKey
   owner: PublicKey
-  account?: Account
+  account?: Keypair
 }
 
 export interface InitAccountInstructionParams {
@@ -63,23 +63,23 @@ export interface InitAccountInstructionParams {
 export interface InitWrappedNativeAccountParams {
   amount: number
   owner: PublicKey
-  account?: Account
+  account?: Keypair
 }
 
 export interface MintToParams {
   token: PublicKey
   to: PublicKey
   amount: bigint
-  authority: Account | PublicKey
-  multiSigners?: Account[]
+  authority: Keypair | PublicKey
+  multiSigners?: Keypair[]
 }
 
 export interface ApproveParams {
   account: PublicKey
   delegate: PublicKey
   amount: bigint
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface Approve2Params {
@@ -88,30 +88,30 @@ export interface Approve2Params {
   delegate: PublicKey
   amount: bigint
   decimals: number
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface RevokeParams {
   account: PublicKey
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface BurnParams {
   token: PublicKey
   from: PublicKey
   amount: bigint
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface TransferParams {
   from: PublicKey
   to: PublicKey
   amount: bigint
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface Transfer2Params {
@@ -120,8 +120,8 @@ export interface Transfer2Params {
   token: PublicKey
   amount: bigint
   decimals: number,
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 type AuthorityType =
@@ -141,29 +141,29 @@ export interface SetAuthorityParams {
   account: PublicKey
   newAuthority: PublicKey | null,
   authorityType: AuthorityType,
-  currentAuthority: Account | PublicKey
-  multiSigners: Account[]
+  currentAuthority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface CloseAccountParams {
   account: PublicKey
   dest: PublicKey,
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface FreezeAccountParams {
   token: PublicKey
   account: PublicKey
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface ThawAccountParams {
   token: PublicKey
   account: PublicKey
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface MintTo2Params {
@@ -171,8 +171,8 @@ export interface MintTo2Params {
   to: PublicKey
   amount: bigint
   decimals: number
-  authority: Account | PublicKey
-  multiSigners: Account[]
+  authority: Keypair | PublicKey
+  multiSigners: Keypair[]
 }
 
 export interface MintToInstructionParams extends MintToParams {
@@ -424,13 +424,13 @@ export class SPLToken extends BaseProgram {
   /**
    * Creates a new token with zero supply
    *
-   * @param mintAuthority Account or multisig that will control minting
+   * @param mintAuthority Keypair or multisig that will control minting
    * @param freezeAuthority Optional account or multisig that can freeze token accounts
    * @param decimals Location of the decimal place
    * @return Token object for the newly minted token
    */
-  public async initializeMint(params: InitMintParams): Promise<Account> {
-    const account = params.account || new Account()
+  public async initializeMint(params: InitMintParams): Promise<Keypair> {
+    const account = params.account || new Keypair()
 
     await this.sendTx([
       await this.sys.createRentFreeAccountInstruction({
@@ -479,8 +479,8 @@ export class SPLToken extends BaseProgram {
    * @return Public key of the new empty account
    */
 
-  public async initializeAccount(params: InitAccountParams): Promise<Account> {
-    const account = params.account || new Account();
+  public async initializeAccount(params: InitAccountParams): Promise<Keypair> {
+    const account = params.account || new Keypair();
 
     await this.sendTx([
       await this.sys.createRentFreeAccountInstruction({
@@ -521,8 +521,8 @@ export class SPLToken extends BaseProgram {
    * @param amount The amount of lamports to wrap
    * @return {Promise<PublicKey>} The new token account
    */
-  public async initializeWrappedNativeAccount(params: InitWrappedNativeAccountParams): Promise<Account> {
-    const account = params.account || new Account();
+  public async initializeWrappedNativeAccount(params: InitWrappedNativeAccountParams): Promise<Keypair> {
+    const account = params.account || new Keypair();
 
     await this.sendTx([
       await this.sys.createRentFreeAccountInstruction({
@@ -556,7 +556,7 @@ export class SPLToken extends BaseProgram {
   public async mintTo(params: MintToParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : (multiSigners || [])
+    const signers = authority.constructor == Keypair ? [authority] : (multiSigners || [])
 
     await this.sendTx([this.mintToInstruction(params)], [this.account, ...signers])
   }
@@ -592,14 +592,14 @@ export class SPLToken extends BaseProgram {
    *
    * @param amount Maximum number of tokens the delegate may transfer
    * @param account Public key of the account
-   * @param delegate Account authorized to perform a transfer of tokens from the source account
+   * @param delegate Keypair authorized to perform a transfer of tokens from the source account
    * @param authority Owner of the source account
    * @param multiSigners Signing accounts if `owner` is a multiSig
    */
   public async approve(params: ApproveParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.approveInstruction(params)], [this.account, ...signers]);
   }
@@ -640,7 +640,7 @@ export class SPLToken extends BaseProgram {
   public async revoke(params: RevokeParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.revokeInstruction(params)], [this.account, ...signers]);
   }
@@ -663,13 +663,13 @@ export class SPLToken extends BaseProgram {
    * @param token The token pubkey
    * @param from  Burn from account
    * @param amount Amount to burn
-   * @param authority Account owner
+   * @param authority Keypair owner
    * @param multiSigners Signing accounts if `owner` is a multiSig
    */
   public async burn(params: BurnParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.burnInstruction(params)], [this.account, ...signers]);
   }
@@ -712,7 +712,7 @@ export class SPLToken extends BaseProgram {
   public async transfer(params: TransferParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.transferInstruction(params)], [this.account, ...signers]);
   }
@@ -755,7 +755,7 @@ export class SPLToken extends BaseProgram {
   public async setAuthority(params: SetAuthorityParams): Promise<void> {
     const { currentAuthority, multiSigners } = params;
 
-    const signers = currentAuthority.constructor == Account ? [currentAuthority] : multiSigners;
+    const signers = currentAuthority.constructor == Keypair ? [currentAuthority] : multiSigners;
 
     await this.sendTx([this.setAuthorityInstruction(params)], [this.account, ...signers]);
   }
@@ -792,15 +792,15 @@ export class SPLToken extends BaseProgram {
   /**
    * Close account
    *
-   * @param account Account to close
-   * @param dest Account to receive the remaining balance of the closed account
+   * @param account Keypair to close
+   * @param dest Keypair to receive the remaining balance of the closed account
    * @param authority Authority which is allowed to close the account
    * @param multiSigners Signing accounts if `authority` is a multiSig
    */
   public async closeAccount(params: CloseAccountParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners;
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners;
 
     await this.sendTx([this.closeAccountInstruction(params)], [this.account, ...signers]);
   }
@@ -832,14 +832,14 @@ export class SPLToken extends BaseProgram {
    * Freeze account
    *
    * @param token The token public key
-   * @param account Account to freeze
+   * @param account Keypair to freeze
    * @param authority The mint freeze authority
    * @param multiSigners Signing accounts if `authority` is a multiSig
    */
   public async freezeAccount(params: FreezeAccountParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners;
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners;
 
     await this.sendTx([this.freezeAccountInstruction(params)], [this.account, ...signers]);
   }
@@ -869,14 +869,14 @@ export class SPLToken extends BaseProgram {
   /**
    * Thaw account
    *
-   * @param account Account to thaw
+   * @param account Keypair to thaw
    * @param authority The mint freeze authority
    * @param multiSigners Signing accounts if `authority` is a multiSig
    */
   public async thawAccount(params: ThawAccountParams): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners;
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners;
 
     await this.sendTx([this.thawAccountInstruction(params)], [this.account, ...signers]);
   }
@@ -917,7 +917,7 @@ export class SPLToken extends BaseProgram {
   public async transfer2(params: Transfer2Params): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.transfer2Instruction(params)], [this.account, ...signers]);
   }
@@ -960,14 +960,14 @@ export class SPLToken extends BaseProgram {
    * @param amount Maximum number of tokens the delegate may transfer
    * @param account Public key of the account
    * @param decimals Number of decimals in approve amount
-   * @param delegate Account authorized to perform a transfer of tokens from the source account
+   * @param delegate Keypair authorized to perform a transfer of tokens from the source account
    * @param authority Owner of the source account
    * @param multiSigners Signing accounts if `owner` is a multiSig
    */
   public async approve2(params: Approve2Params): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.approve2Instruction(params)], [this.account, ...signers]);
   }
@@ -1016,7 +1016,7 @@ export class SPLToken extends BaseProgram {
   public async mintTo2(params: MintTo2Params): Promise<void> {
     const { authority, multiSigners } = params;
 
-    const signers = authority.constructor == Account ? [authority] : multiSigners
+    const signers = authority.constructor == Keypair ? [authority] : multiSigners
 
     await this.sendTx([this.mintTo2Instruction(params)], [this.account, ...signers])
   }

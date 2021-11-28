@@ -3,7 +3,7 @@ import {
   Transaction,
   sendAndConfirmTransaction,
   TransactionInstruction,
-  Account,
+  Keypair,
   Connection,
 } from "@safecoin/web3.js"
 
@@ -20,7 +20,7 @@ export abstract class BaseProgram {
     return this.wallet.conn
   }
 
-  protected get account(): Account {
+  protected get account(): Keypair {
     return this.wallet.account
   }
 
@@ -31,7 +31,7 @@ export abstract class BaseProgram {
 
   // sendTx sends and confirm instructions in a transaction. It automatically adds
   // the wallet's account as a signer to pay for the transaction.
-  protected async sendTx(insts: TransactionInstruction[], signers: Account[] = []): Promise<string> {
+  protected async sendTx(insts: TransactionInstruction[], signers: Keypair[] = []): Promise<string> {
     const tx = new Transaction()
 
     for (let inst of insts) {
@@ -65,7 +65,7 @@ export abstract class BaseProgram {
   }
 }
 
-export type InstructionAuthority = Account | Account[] | PublicKey[] | PublicKey | { write: PublicKey | Account }
+export type InstructionAuthority = Keypair | Keypair[] | PublicKey[] | PublicKey | { write: PublicKey | Keypair }
 
 function authsToKeys(auths: InstructionAuthority[]): InstructionKey[] {
   const keys: InstructionKey[] = []
@@ -82,12 +82,12 @@ function authsToKeys(auths: InstructionAuthority[]): InstructionKey[] {
   return keys
 }
 
-function authToKey(auth: Account | PublicKey, isWritable = false): InstructionKey {
+function authToKey(auth: Keypair | PublicKey, isWritable = false): InstructionKey {
   // FIXME: @safecoin/web3.js and solray may import different versions of PublicKey, causing
   // the typecheck here to fail. Let's just compare constructor name for now -.-
-  if (auth.constructor.name == Account.name) {
+  if (auth.constructor.name == Keypair.name) {
     return {
-      pubkey: (auth as Account).publicKey,
+      pubkey: (auth as Keypair).publicKey,
       isSigner: true,
       isWritable,
     }
@@ -99,7 +99,7 @@ function authToKey(auth: Account | PublicKey, isWritable = false): InstructionKe
     }
   }
 
-  throw new Error(`Invalid instruction authority. Expect Account | PublicKey`)
+  throw new Error(`Invalid instruction authority. Expect Keypair | PublicKey`)
 }
 
 interface InstructionKey {

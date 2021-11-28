@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   BpfLoader,
   BPF_LOADER_PROGRAM_ID,
 } from "@safecoin/web3.js"
@@ -16,16 +16,16 @@ export class BPFLoader {
 
   public async loadFile(
     binaryPath: string,
-    programAccount = new Account(),
-  ): Promise<Account> {
+    programAccount = new Keypair(),
+  ): Promise<Keypair> {
     const bin = await fs.readFile(binaryPath);
     return this.load(bin, programAccount);
   }
 
   public async load(
     programBinary: Buffer,
-    programAccount = new Account(),
-  ): Promise<Account> {
+    programAccount = new Keypair(),
+  ): Promise<Keypair> {
     await BpfLoader.load(
       this.wallet.conn,
       this.wallet.account,
