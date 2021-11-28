@@ -1,4 +1,4 @@
-# solray
+# saferay
 
 DApp Toolkit for safecoin.
 
@@ -94,7 +94,7 @@ import {
   BaseProgram,
   ProgramAccount,
   SPLToken,
-} from "solray"
+} from "saferay"
 
 interface RequestParams {
   receiver: PublicKey

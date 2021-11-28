@@ -1,10 +1,10 @@
 {
-  "name": "solray",
+  "name": "saferay",
   "version": "0.0.1",
   "main": "./lib/index.js",
   "testnetDefaultChannel": "v1.4.9",
   "bin": {
-    "solray": "./lib/bin/solray.js"
+    "saferay": "./lib/bin/saferay.js"
   },
   "license": "MIT",
   "scripts": {
